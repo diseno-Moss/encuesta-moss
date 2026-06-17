@@ -59,7 +59,15 @@
   <div class="step active" id="s0">
     <div class="section-tag">Bienvenida</div>
     <p class="q-title">¡Hola! 👋 Gracias por confiar en <strong>Moss</strong> para tu proyecto.<br><br>Esta encuesta nos ayuda a mejorar nuestra etapa de diseño. Solo toma 3 minutos y tus respuestas son muy valiosas para nosotros.</p>
-    <div class="nav"><button class="nav-btn primary" onclick="goTo(1)">Empecemos →</button></div>
+    <div class="aspect-block">
+      <p class="subaspecto">Tu nombre</p>
+      <input id="cliente-nombre" type="text" placeholder="Escribe tu nombre aquí..." style="width:100%;border:1.5px solid #d0d0d0;border-radius:10px;padding:12px;font-size:15px;font-family:inherit;color:#1a1a1a;background:#fff;outline:none;" onfocus="this.style.borderColor='#6B7B3A'" onblur="this.style.borderColor='#d0d0d0'"/>
+    </div>
+    <div class="aspect-block">
+      <p class="subaspecto">Nombre del proyecto</p>
+      <input id="cliente-proyecto" type="text" placeholder="Escribe el nombre del proyecto..." style="width:100%;border:1.5px solid #d0d0d0;border-radius:10px;padding:12px;font-size:15px;font-family:inherit;color:#1a1a1a;background:#fff;outline:none;" onfocus="this.style.borderColor='#6B7B3A'" onblur="this.style.borderColor='#d0d0d0'"/>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="nextBienvenida()">Empecemos →</button></div>
   </div>
 
   <div class="step" id="s1">
@@ -181,14 +189,27 @@
 </div>
 
 <script>
-  const TOKEN = 'pat3UR1BNKMzmKjI0.32dcc286f60b4305513f500decee4e84d9f8282b91d1f344d9e6573b714f6ef9';
+  const TOKEN = 'pat3UR1BNKMzmKjI0.c06fa8f7960bd65a266bc3d4d804642d7beb531a9968ea695ed3e23d01ac3f2f';
   const BASE_ID = 'apprDvdMpWNoi4uI9';
   const TABLE_ID = 'tbly5XTHieDj2Jamy';
 
   const answers = {};
   let cur = 0;
 
-  function updateProgress(n) {
+  function nextBienvenida() {
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const proyecto = document.getElementById('cliente-proyecto').value.trim();
+    if (!nombre || !proyecto) {
+      if (!nombre) { document.getElementById('cliente-nombre').style.borderColor = '#E24B4A'; setTimeout(() => document.getElementById('cliente-nombre').style.borderColor = '#d0d0d0', 1000); }
+      if (!proyecto) { document.getElementById('cliente-proyecto').style.borderColor = '#E24B4A'; setTimeout(() => document.getElementById('cliente-proyecto').style.borderColor = '#d0d0d0', 1000); }
+      return;
+    }
+    answers['nombre'] = nombre;
+    answers['proyecto'] = proyecto;
+    goTo(1);
+  }
+
+
     document.getElementById('prog').style.width = Math.round((n / 9) * 100) + '%';
   }
 
@@ -270,6 +291,8 @@
   async function submitSurvey() {
     goTo('sending');
     const fields = {
+      "Nombre": answers['nombre'] || '',
+      "Proyecto": answers['proyecto'] || '',
       "Pregunta1": answers['p1'] || '',
       "Pregunta2": answers['p2'] || '',
       "Trato": answers['trato'] || 0,

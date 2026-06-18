@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Encuesta Moss — Etapa de Diseño</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #f9f9f7; color: #1a1a1a; }
+    .survey-wrap { max-width: 620px; margin: 40px auto; background: #fff; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 16px rgba(0,0,0,0.07); }
+    .progress-bar-bg { background: #e0e0e0; border-radius: 99px; height: 6px; margin-bottom: 2rem; }
+    .progress-bar-fill { background: #6B7B3A; height: 6px; border-radius: 99px; transition: width 0.4s ease; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .q-label { font-size: 13px; font-weight: 500; color: #666; margin-bottom: 4px; }
+    .q-title { font-size: 18px; font-weight: 500; color: #1a1a1a; margin-bottom: 1.5rem; line-height: 1.4; }
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .opt-btn {
+      background: #ffffff; border: 1.5px solid #d0d0d0; border-radius: 10px;
+      padding: 12px 16px; font-size: 15px; color: #1a1a1a;
+      cursor: pointer; text-align: left; width: 100%; transition: all 0.2s;
+    }
+    .opt-btn:hover { background: #f5f5f5; border-color: #aaa; }
+    .star-row { display: flex; gap: 10px; margin-bottom: 0.4rem; }
+    .star { font-size: 32px; cursor: pointer; color: #d0d0d0; transition: color 0.15s; line-height: 1; user-select: none; }
+    .star.active { color: #EF9F27; }
+    .nps-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .nps-btn {
+      width: 44px; height: 44px; border-radius: 8px; border: 1.5px solid #d0d0d0;
+      background: #ffffff; font-size: 14px; font-weight: 500;
+      cursor: pointer; color: #1a1a1a; transition: all 0.15s;
+    }
+    .nps-btn:hover { background: #f5f5f5; }
+    .nps-labels { display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-top: 8px; }
+    textarea, .text-input {
+      width: 100%; border: 1.5px solid #d0d0d0; border-radius: 10px;
+      padding: 12px; font-size: 15px; font-family: inherit;
+      color: #1a1a1a; background: #fff; outline: none;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    .text-input:focus, textarea:focus { border-color: #6B7B3A; }
+    .nav { display: flex; justify-content: flex-end; margin-top: 1.5rem; }
+    .nav-btn {
+      background: #fff; border: 1.5px solid #d0d0d0; border-radius: 8px;
+      padding: 10px 22px; font-size: 15px; cursor: pointer; color: #1a1a1a;
+    }
+    .nav-btn.primary { background: #6B7B3A; color: #fff; border-color: #6B7B3A; }
+    .nav-btn:hover { opacity: 0.85; }
+    .thank-you { text-align: center; padding: 3rem 0; }
+    .section-tag { display: inline-block; background: #EEF1E3; color: #4A5628; font-size: 12px; padding: 3px 10px; border-radius: 99px; margin-bottom: 1.2rem; }
+    .subaspecto { font-size: 14px; color: #555; margin: 0 0 6px; }
+    .aspect-block { margin-bottom: 1.2rem; }
+    .sending { text-align: center; padding: 2rem 0; color: #666; font-size: 15px; }
+  </style>
+</head>
+<body>
+<div class="survey-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog" style="width:10%"></div></div>
+
+  <div class="step active" id="s0">
+    <div class="section-tag">Bienvenida</div>
+    <p class="q-title">¡Hola! 👋 Gracias por confiar en <strong>Moss</strong> para tu proyecto.<br><br>Esta encuesta nos ayuda a mejorar nuestra etapa de diseño. Solo toma 3 minutos y tus respuestas son muy valiosas para nosotros.</p>
+    <div class="aspect-block">
+      <p class="subaspecto">Tu nombre</p>
+      <input id="cliente-nombre" type="text" class="text-input" placeholder="Escribe tu nombre aquí..."/>
+    </div>
+    <div class="aspect-block">
+      <p class="subaspecto">Nombre del proyecto</p>
+      <input id="cliente-proyecto" type="text" class="text-input" placeholder="Escribe el nombre del proyecto..."/>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="nextBienvenida()">Empecemos →</button></div>
+  </div>
+
+  <div class="step" id="s1">
+    <p class="q-label">Pregunta 1 de 9 — Reuniones de diseño</p>
+    <p class="q-title">¿Cómo te sentiste durante nuestras reuniones de diseño?</p>
+    <div class="options" id="opts-p1">
+      <button class="opt-btn" onclick="pick('p1',this)">Muy cómodo/a — me escucharon y entendieron mis ideas</button>
+      <button class="opt-btn" onclick="pick('p1',this)">Bien — hubo buena comunicación en general</button>
+      <button class="opt-btn" onclick="pick('p1',this)">Regular — algunas cosas no quedaron del todo claras</button>
+      <button class="opt-btn" onclick="pick('p1',this)">Poco cómodo/a — me faltó más espacio para expresarme</button>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="next(2,'p1')">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s2">
+    <p class="q-label">Pregunta 2 de 9 — Entrega de propuesta</p>
+    <p class="q-title">¿La propuesta de diseño reflejó lo que habías pedido?</p>
+    <div class="options" id="opts-p2">
+      <button class="opt-btn" onclick="pick('p2',this)">Totalmente — superó mis expectativas</button>
+      <button class="opt-btn" onclick="pick('p2',this)">En su mayoría — hubo pequeños ajustes por hacer</button>
+      <button class="opt-btn" onclick="pick('p2',this)">Parcialmente — faltaron elementos importantes</button>
+      <button class="opt-btn" onclick="pick('p2',this)">No mucho — no coincidió con lo que esperaba</button>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="next(3,'p2')">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s3">
+    <p class="q-label">Pregunta 3 de 9 — Calificación profesional</p>
+    <p class="q-title">¿Cómo calificarías al diseñador en los siguientes aspectos?</p>
+    <div class="aspect-block"><p class="subaspecto">Trato y amabilidad</p><div class="star-row" id="stars-trato"></div></div>
+    <div class="aspect-block"><p class="subaspecto">Puntualidad y cumplimiento</p><div class="star-row" id="stars-puntual"></div></div>
+    <div class="aspect-block"><p class="subaspecto">Dominio y conocimiento del tema</p><div class="star-row" id="stars-conocimiento"></div></div>
+    <div class="nav"><button class="nav-btn primary" onclick="goTo(4)">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s4">
+    <p class="q-label">Pregunta 4 de 9 — Calificación del trabajo</p>
+    <p class="q-title">¿Cómo calificarías el resultado del diseño?</p>
+    <div class="aspect-block"><p class="subaspecto">Creatividad y propuesta visual</p><div class="star-row" id="stars-creatividad"></div></div>
+    <div class="aspect-block"><p class="subaspecto">Funcionalidad y coherencia con el espacio</p><div class="star-row" id="stars-funcionalidad"></div></div>
+    <div class="aspect-block"><p class="subaspecto">Calidad general del entregable</p><div class="star-row" id="stars-calidad"></div></div>
+    <div class="nav"><button class="nav-btn primary" onclick="goTo(5)">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s5">
+    <p class="q-label">Pregunta 5 de 9 — Comunicación</p>
+    <p class="q-title">¿Las decisiones de diseño fueron explicadas con claridad?</p>
+    <div class="options" id="opts-p5">
+      <button class="opt-btn" onclick="pick('p5',this)">Sí, entendí muy bien el porqué de cada decisión</button>
+      <button class="opt-btn" onclick="pick('p5',this)">En su mayoría sí, aunque algunos puntos quedaron poco claros</button>
+      <button class="opt-btn" onclick="pick('p5',this)">Faltó más explicación en varios momentos</button>
+      <button class="opt-btn" onclick="pick('p5',this)">No, no entendí bien las decisiones tomadas</button>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="next(6,'p5')">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s6">
+    <p class="q-label">Pregunta 6 de 9 — Tiempos</p>
+    <p class="q-title">¿Se respetaron los plazos acordados durante la etapa de diseño?</p>
+    <div class="options" id="opts-p6">
+      <button class="opt-btn" onclick="pick('p6',this)">Sí, todo se entregó en los tiempos pactados</button>
+      <button class="opt-btn" onclick="pick('p6',this)">Casi siempre, con retrasos pequeños y justificados</button>
+      <button class="opt-btn" onclick="pick('p6',this)">Hubo demoras que afectaron un poco el proceso</button>
+      <button class="opt-btn" onclick="pick('p6',this)">Los tiempos no se cumplieron y fue un problema</button>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="next(7,'p6')">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s7">
+    <p class="q-label">Pregunta 7 de 9 — Satisfacción general</p>
+    <p class="q-title">Del 1 al 10, ¿qué tan satisfecho/a estás con la etapa de diseño?</p>
+    <div class="nps-row" id="nps-row"></div>
+    <div class="nps-labels"><span>Nada satisfecho/a</span><span>Totalmente satisfecho/a</span></div>
+    <div class="nav"><button class="nav-btn primary" onclick="goTo(8)">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s8">
+    <p class="q-label">Pregunta 8 de 9 — Oportunidades de mejora</p>
+    <p class="q-title">¿Hay algo que podríamos hacer mejor en la etapa de diseño?</p>
+    <textarea id="mejora" placeholder="Cuéntanos con libertad, toda retroalimentación es bienvenida..."></textarea>
+    <div class="nav"><button class="nav-btn primary" onclick="goTo(9)">Siguiente →</button></div>
+  </div>
+
+  <div class="step" id="s9">
+    <p class="q-label">Pregunta 9 de 9 — Percepción de valor</p>
+    <p class="q-title">¿Sientes que contar con un diseño personalizado hace una diferencia real en tu proyecto de remodelación?</p>
+    <div class="options" id="opts-p9" style="margin-bottom:1rem">
+      <button class="opt-btn" onclick="pick('p9',this); toggleValor(true)">Sí, definitivamente — el diseño es clave para el resultado final</button>
+      <button class="opt-btn" onclick="pick('p9',this); toggleValor(false)">Más o menos — ayuda, pero no lo veo indispensable</button>
+      <button class="opt-btn" onclick="pick('p9',this); toggleValor(false)">No mucho — creo que se puede lograr un buen resultado sin él</button>
+    </div>
+    <div id="valor-open" style="display:none; margin-bottom:1rem">
+      <p class="subaspecto">¿Por qué lo consideras clave? (opcional)</p>
+      <textarea id="valor-txt" placeholder="Comparte tu experiencia..."></textarea>
+    </div>
+    <div class="nav"><button class="nav-btn primary" onclick="submitSurvey()">Enviar encuesta →</button></div>
+  </div>
+
+  <div class="step" id="s-sending">
+    <div class="sending"><p style="font-size:20px">Enviando tus respuestas... ⏳</p></div>
+  </div>
+
+  <div class="step" id="s-done">
+    <div class="thank-you">
+      <p class="q-title" style="font-size:24px; margin-bottom:0.75rem">¡Muchas gracias por tu tiempo!</p>
+      <p style="color:#666; font-size:15px; line-height:1.7;">Tus respuestas ayudan a <strong>Moss</strong> a mejorar cada proyecto.<br>Nos vemos en la etapa de obra 🏗️</p>
+    </div>
+  </div>
+
+  <div class="step" id="s-error">
+    <div class="thank-you">
+      <p class="q-title" style="font-size:20px; color:#E24B4A">Ocurrió un error al enviar 😕</p>
+      <p style="color:#666; font-size:14px;" id="error-detail"></p>
+      <div class="nav" style="justify-content:center; margin-top:1rem">
+        <button class="nav-btn primary" onclick="goTo(9)">Volver a intentar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TOKEN = 'pat3UR1BNKMzmKjI0.c06fa8f7960bd65a266bc3d4d804642d7beb531a9968ea695ed3e23d01ac3f2f';
+  const BASE_ID = 'apprDvdMpWNoi4uI9';
+  const TABLE_ID = 'tbly5XTHieDj2Jamy';
+
+  const answers = {};
+  let cur = 0;
+
+  function updateProgress(n) {
+    document.getElementById('prog').style.width = Math.round((n / 9) * 100) + '%';
+  }
+
+  function goTo(n) {
+    ['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9','s-sending','s-done','s-error']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('active'); });
+    const map = { sending:'s-sending', done:'s-done', error:'s-error' };
+    const targetId = map[n] || ('s' + n);
+    const el = document.getElementById(targetId);
+    if (el) el.classList.add('active');
+    cur = n;
+    if (typeof n === 'number') updateProgress(n);
+    window.scrollTo(0, 0);
+  }
+
+  function nextBienvenida() {
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const proyecto = document.getElementById('cliente-proyecto').value.trim();
+    if (!nombre) { document.getElementById('cliente-nombre').style.borderColor = '#E24B4A'; setTimeout(() => document.getElementById('cliente-nombre').style.borderColor = '#d0d0d0', 1000); }
+    if (!proyecto) { document.getElementById('cliente-proyecto').style.borderColor = '#E24B4A'; setTimeout(() => document.getElementById('cliente-proyecto').style.borderColor = '#d0d0d0', 1000); }
+    if (!nombre || !proyecto) return;
+    answers['nombre'] = nombre;
+    answers['proyecto'] = proyecto;
+    goTo(1);
+  }
+
+  function pick(key, btn) {
+    const container = document.getElementById('opts-' + key);
+    if (!container) return;
+    container.querySelectorAll('.opt-btn').forEach(b => {
+      b.style.background = '#ffffff'; b.style.borderColor = '#d0d0d0';
+      b.style.color = '#1a1a1a'; b.style.fontWeight = '';
+    });
+    btn.style.background = '#EEF1E3'; btn.style.borderColor = '#6B7B3A';
+    btn.style.color = '#3a4a1a'; btn.style.fontWeight = '500';
+    answers[key] = btn.textContent.trim();
+  }
+
+  function next(to, key) {
+    if (!answers[key]) {
+      const container = document.getElementById('opts-' + key);
+      if (container) {
+        const btns = container.querySelectorAll('.opt-btn');
+        btns.forEach(b => { b.style.borderColor = '#E24B4A'; });
+        setTimeout(() => btns.forEach(b => { b.style.borderColor = '#d0d0d0'; }), 1000);
+      }
+      return;
+    }
+    goTo(to);
+  }
+
+  function toggleValor(show) {
+    document.getElementById('valor-open').style.display = show ? 'block' : 'none';
+  }
+
+  function buildStars(containerId, key) {
+    const c = document.getElementById(containerId);
+    if (!c) return;
+    answers[key] = 0;
+    for (let i = 1; i <= 5; i++) {
+      const s = document.createElement('span');
+      s.className = 'star'; s.textContent = '★'; s.dataset.val = i;
+      s.addEventListener('click', function() {
+        const val = parseInt(this.dataset.val);
+        answers[key] = val;
+        c.querySelectorAll('.star').forEach(x => x.classList.toggle('active', parseInt(x.dataset.val) <= val));
+      });
+      c.appendChild(s);
+    }
+  }
+
+  function buildNps() {
+    const c = document.getElementById('nps-row');
+    if (!c) return;
+    answers['nps'] = 0;
+    for (let i = 1; i <= 10; i++) {
+      const b = document.createElement('button');
+      b.className = 'nps-btn'; b.textContent = i;
+      b.addEventListener('click', function() {
+        answers['nps'] = i;
+        c.querySelectorAll('.nps-btn').forEach(x => {
+          x.style.background = '#ffffff'; x.style.borderColor = '#d0d0d0'; x.style.color = '#1a1a1a';
+        });
+        this.style.background = '#EEF1E3'; this.style.borderColor = '#6B7B3A'; this.style.color = '#3a4a1a';
+      });
+      c.appendChild(b);
+    }
+  }
+
+  async function submitSurvey() {
+    goTo('sending');
+    const fields = {
+      "Nombre": answers['nombre'] || '',
+      "Proyecto": answers['proyecto'] || '',
+      "Pregunta1": answers['p1'] || '',
+      "Pregunta2": answers['p2'] || '',
+      "Trato": answers['trato'] || 0,
+      "Puntualidad": answers['puntual'] || 0,
+      "Conocimiento": answers['conocimiento'] || 0,
+      "Creatividad": answers['creatividad'] || 0,
+      "Funcionalidad": answers['funcionalidad'] || 0,
+      "Calidad": answers['calidad'] || 0,
+      "Pregunta5": answers['p5'] || '',
+      "Pregunta6": answers['p6'] || '',
+      "Satisfaccion": answers['nps'] || 0,
+      "Mejora": document.getElementById('mejora').value || '',
+      "Valor": answers['p9'] || '',
+      "PorQueEsClave": document.getElementById('valor-txt') ? document.getElementById('valor-txt').value : '',
+      "Fecha": new Date().toISOString().split('T')[0]
+    };
+
+    try {
+      const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fields })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        goTo('done');
+      } else {
+        document.getElementById('error-detail').textContent = JSON.stringify(data.error || data);
+        goTo('error');
+      }
+    } catch(e) {
+      document.getElementById('error-detail').textContent = e.message;
+      goTo('error');
+    }
+  }
+
+  buildStars('stars-trato', 'trato');
+  buildStars('stars-puntual', 'puntual');
+  buildStars('stars-conocimiento', 'conocimiento');
+  buildStars('stars-creatividad', 'creatividad');
+  buildStars('stars-funcionalidad', 'funcionalidad');
+  buildStars('stars-calidad', 'calidad');
+  buildNps();
+</script>
+</body>
+</html>
